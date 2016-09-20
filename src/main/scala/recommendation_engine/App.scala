@@ -16,11 +16,13 @@ object App {
 
     try {
 
+      // 1. Inspect the raw ratings dataset
       // Load the raw ratings data from a file
       val rawData = sc.textFile("./data/ml-100k/u.data")
       println("raw data ", rawData.first()) // 196	242	3	881250949
 
-      // Extract the user id, movie id and rating only from the data set
+
+      // 2. Extract the user id, movie id and rating only from the data set
       val rawRatings = rawData.map(_.split("\t").take(3))
       println("extracted data")
       rawRatings.first().foreach(println) // 196 242 3
@@ -34,7 +36,10 @@ object App {
       }
       println("rating ", ratings.first())
 
-      // Train the ALS model with rank=50, iterations=10, lambda=0.01
+
+
+      // 3. Train the ALS model with rank=50, iterations=10, lambda=0.01
+      // returns a MatrixFactorizationModel object
       val model = ALS.train(ratings, 50, 10, 0.01)
       // Inspect the user factors
       println("inspect user features ", model.userFeatures)
@@ -42,6 +47,8 @@ object App {
       println("count user features ", model.userFeatures.count)
       println("count product features ", model.productFeatures.count)
 
+
+      // 4. Using the recommendation model
       // Make a prediction for a single user and movie pair
       val userId = 789
       val predictedRating = model.predict(789, 123)
@@ -51,6 +58,8 @@ object App {
       val topKRecs = model.recommendProducts(userId, K)
       println(topKRecs.mkString("\n"))
 
+
+      // 5. Inspecting the recommendations
       // Load movie titles to inspect the recommendations
       val movies = sc.textFile("./data/ml-100k/u.item")
       val titles = movies.map(line => line.split("\\|").take(2))
@@ -67,11 +76,14 @@ object App {
       println("top k movies recommended for user \n")
       topKRecs.map(rating => (titles(rating.product), rating.rating)).foreach(println)
 
+
+      // 6. Item recommendations
       // Compute item-to-item similarities between an item and the other items
       import org.jblas.DoubleMatrix
       val aMatrix = new DoubleMatrix(Array(1.0, 2.0, 3.0))
 
       // Compute the cosine similarity between two vectors
+      // Cosine similarity is a measure of the angle between two vectors in an n-dimensional space.
       def cosineSimilarity(vec1: DoubleMatrix, vec2: DoubleMatrix): Double = {
         vec1.dot(vec2) / (vec1.norm2() * vec2.norm2())
       }
@@ -90,20 +102,22 @@ object App {
       println("\n similarities")
       println(sortedSims.mkString("\n"))
 
-
       // We can check the movie title of our chosen movie and the most similar movies to it
       val sortedSims2 = sims.top(K + 1)(Ordering.by[(Int, Double), Double] { case (id, similarity) => similarity })
       println("\n sims with titles")
       println(sortedSims2.slice(1, 11).map{ case (id, sim) => (titles(id), sim) }.mkString("\n"))
 
 
+      // 7. Evaluating the recommendation model
+      // Evaluation metrics are measures of a model's predictive capability or accuracy.
       // Compute squared error between a predicted and actual rating
       // We'll take the first rating for our example user 789
       val actualRating = moviesForUser.take(1)(0)
       val predictedRatingForGivenUser = model.predict(userId, actualRating.product)
       val squaredError = math.pow(predictedRatingForGivenUser - actualRating.rating, 2.0)
-      println(predictedRatingForGivenUser, " predictedRatingForGivenUser")
       println("\n")
+      println(actualRating, " actualRating")
+      println(predictedRatingForGivenUser, " predictedRatingForGivenUser")
       println(squaredError, " squaredError")
       println("\n")
 
@@ -182,7 +196,9 @@ object App {
       println("Mean Average Precision at K = " + MAPK)
 
 
-      // Using MLlib built-in metrics
+
+      // 8. Evaluating with using MLlib built-in metrics
+      // it shows the same result as we calculated earlier
       import org.apache.spark.mllib.evaluation.RegressionMetrics
       val predictedAndTrue = ratingsAndPredictions.map { case ((user, product), (actual, predicted)) => (actual, predicted) }
       val regressionMetrics = new RegressionMetrics(predictedAndTrue)
@@ -205,12 +221,6 @@ object App {
         avgPrecisionK(actual, predicted, 2000)
       }.reduce(_ + _) / allRecs.count
       println("Mean Average Precision, MAPK2000 = " + MAPK2000)
-
-
-
-
-
-
 
 
     } finally {
