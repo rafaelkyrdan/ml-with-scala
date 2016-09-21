@@ -1,16 +1,8 @@
 package classification
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.classification.LogisticRegressionWithSGD
-import org.apache.spark.mllib.classification.SVMWithSGD
-import org.apache.spark.mllib.classification.NaiveBayes
-import org.apache.spark.mllib.tree.DecisionTree
-import org.apache.spark.mllib.tree.configuration.Algo
-import org.apache.spark.mllib.tree.impurity.Entropy
+import org.apache.spark.mllib.classification.{LogisticRegressionWithSGD, SVMWithSGD}
 import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
+import org.apache.spark.{SparkConf, SparkContext}
 
 
 /**
@@ -37,8 +29,8 @@ object AppEnhanced {
       val records = rawData.map(line => line.split("\t"))
 
       // 2. Cleaning, trimming and fixing the missing data
-      import org.apache.spark.mllib.regression.LabeledPoint
       import org.apache.spark.mllib.linalg.Vectors
+      import org.apache.spark.mllib.regression.LabeledPoint
       val data = records.map { r =>
         val trimmed = r.map(_.replaceAll("\"", ""))
         val label = trimmed(r.size - 1).toInt
@@ -68,7 +60,7 @@ object AppEnhanced {
       println("\ncompare the raw features with the scaled features")
       println(data.first.features)
       println(scaledData.first.features)
-      println((0.789131 - 0.41225805299526636)/math.sqrt(0.1097424416755897))
+      println((0.789131 - 0.41225805299526636) / math.sqrt(0.1097424416755897))
 
       // 4. Re-train
       // number iterations for logistic regression and SVM

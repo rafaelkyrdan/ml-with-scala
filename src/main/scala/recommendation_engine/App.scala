@@ -1,6 +1,11 @@
 package recommendation_engine
 
 import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.mllib.recommendation.ALS
+import org.apache.spark.mllib.recommendation.Rating
+import org.jblas.DoubleMatrix
+import org.apache.spark.mllib.evaluation.RankingMetrics
+import org.apache.spark.mllib.evaluation.RegressionMetrics
 
 /**
   *
@@ -19,7 +24,6 @@ object App {
 
     val sc = new SparkContext(conf)
 
-
     try {
 
       // 1. Inspect the raw ratings dataset
@@ -27,21 +31,16 @@ object App {
       val rawData = sc.textFile("./data/ml-100k/u.data")
       println("raw data ", rawData.first()) // 196	242	3	881250949
 
-
       // 2. Extract the user id, movie id and rating only from the data set
       val rawRatings = rawData.map(_.split("\t").take(3))
       println("extracted data")
       rawRatings.first().foreach(println) // 196 242 3
-
-      import org.apache.spark.mllib.recommendation.ALS
-      import org.apache.spark.mllib.recommendation.Rating
 
       // Construct the RDD of Rating objects
       val ratings = rawRatings.map {
         case Array(user, movie, rating) => Rating(user.toInt, movie.toInt, rating.toDouble)
       }
       println("rating ", ratings.first())
-
 
 
       // 3. Train the ALS model with rank=50, iterations=10, lambda=0.01
@@ -85,7 +84,6 @@ object App {
 
       // 6. Item recommendations
       // Compute item-to-item similarities between an item and the other items
-      import org.jblas.DoubleMatrix
       val aMatrix = new DoubleMatrix(Array(1.0, 2.0, 3.0))
 
       // Compute the cosine similarity between two vectors
@@ -202,17 +200,14 @@ object App {
       println("Mean Average Precision at K = " + MAPK)
 
 
-
       // 8. Evaluating with using MLlib built-in metrics
       // it shows the same result as we calculated earlier
-      import org.apache.spark.mllib.evaluation.RegressionMetrics
       val predictedAndTrue = ratingsAndPredictions.map { case ((user, product), (actual, predicted)) => (actual, predicted) }
       val regressionMetrics = new RegressionMetrics(predictedAndTrue)
       println("Mean Squared Error = " + regressionMetrics.meanSquaredError)
       println("Root Mean Squared Error = " + regressionMetrics.rootMeanSquaredError)
 
 
-      import org.apache.spark.mllib.evaluation.RankingMetrics
       val predictedAndTrueForRanking = allRecs.join(userMovies).map { case (userId, (predicted, actualWithIds)) =>
         val actual = actualWithIds.map(_._2)
         (predicted.toArray, actual.toArray)

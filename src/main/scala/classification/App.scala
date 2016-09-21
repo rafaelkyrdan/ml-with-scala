@@ -177,7 +177,7 @@ object App {
       }
 
       // again, we need to use the special nbData for the naive Bayes metrics
-      val nbMetrics = Seq(nbModel).map{ model =>
+      val nbMetrics = Seq(nbModel).map { model =>
         val scoreAndLabels = nbData.map { point =>
           val score = model.predict(point.features)
           (if (score > 0.5) 1.0 else 0.0, point.label)
@@ -188,7 +188,7 @@ object App {
 
       // here we need to compute for decision tree separately since it does
       // not implement the ClassificationModel interface
-      val dtMetrics = Seq(dtModel).map{ model =>
+      val dtMetrics = Seq(dtModel).map { model =>
         val scoreAndLabels = data.map { point =>
           val score = model.predict(point.features)
           (if (score > 0.5) 1.0 else 0.0, point.label)
@@ -199,7 +199,7 @@ object App {
 
       val allMetrics = metrics ++ nbMetrics ++ dtMetrics
       println("\nPR and ROC curves")
-      allMetrics.foreach{ case (m, pr, roc) =>
+      allMetrics.foreach { case (m, pr, roc) =>
         println(f"$m, Area under PR: ${pr * 100.0}%2.4f%%, Area under ROC: ${roc * 100.0}%2.4f%%")
       }
 
