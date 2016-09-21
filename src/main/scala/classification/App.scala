@@ -1,15 +1,13 @@
 package classification
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.mllib.classification.{LogisticRegressionWithSGD, NaiveBayes, SVMWithSGD}
+import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.classification.LogisticRegressionWithSGD
-import org.apache.spark.mllib.classification.SVMWithSGD
-import org.apache.spark.mllib.classification.NaiveBayes
+import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.tree.DecisionTree
 import org.apache.spark.mllib.tree.configuration.Algo
 import org.apache.spark.mllib.tree.impurity.Entropy
-import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
+import org.apache.spark.{SparkConf, SparkContext}
 
 
 /**

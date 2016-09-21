@@ -6,7 +6,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 
 /**
-  *
+  * Enhanced version of `App.scala`
   *
   */
 
@@ -65,8 +65,6 @@ object AppEnhanced {
       // 4. Re-train
       // number iterations for logistic regression and SVM
       val numIterations = 10
-      // the max depth tree for decision tree
-      val maxTreeDepth = 5
 
       // 4.1 train a logistic regression model on the scaled data
       val lrModelScaled = LogisticRegressionWithSGD.train(scaledData, numIterations)
