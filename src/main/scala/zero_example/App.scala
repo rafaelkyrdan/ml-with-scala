@@ -1,6 +1,6 @@
 package zero_example
 
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.SparkContext._
 
 
@@ -14,9 +14,14 @@ object App {
 
   def main(args: Array[String]) {
 
-    val sc = new SparkContext("local[2]", "Zero Example")
+    val conf = new SparkConf()
+      .setMaster("local[2]")
+      .setAppName("Zero Example")
+      .set("spark.app.id", "zero-example")
 
-    try{
+    val sc = new SparkContext(conf)
+
+    try {
 
       // we take the raw data and convert it into a set of records(user, product, price)
       val data = sc.textFile("data/0/PurchaseHistory.csv")

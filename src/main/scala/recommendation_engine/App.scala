@@ -1,6 +1,6 @@
 package recommendation_engine
 
-import org.apache.spark.SparkContext
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
   *
@@ -12,7 +12,13 @@ object App {
   def main(args: Array[String]): Unit = {
 
 
-    val sc = new SparkContext("local[2]", "Zero Example")
+    val conf = new SparkConf()
+      .setMaster("local[2]")
+      .setAppName("Recommendation engine")
+      .set("spark.app.id", "recommendation-engine")
+
+    val sc = new SparkContext(conf)
+
 
     try {
 
@@ -65,7 +71,7 @@ object App {
       val titles = movies.map(line => line.split("\\|").take(2))
         .map(array => (array(0).toInt, array(1))).collectAsMap()
       println("\n")
-      println("titles ", titles(123) )
+      println("titles ", titles(123))
 
       val moviesForUser = ratings.keyBy(_.user).lookup(userId)
       println(moviesForUser.size)
@@ -93,7 +99,7 @@ object App {
       val itemVector = new DoubleMatrix(itemFactor)
       cosineSimilarity(itemVector, itemVector)
 
-      val sims = model.productFeatures.map{ case (id, factor) =>
+      val sims = model.productFeatures.map { case (id, factor) =>
         val factorVector = new DoubleMatrix(factor)
         val sim = cosineSimilarity(factorVector, itemVector)
         (id, sim)
@@ -105,7 +111,7 @@ object App {
       // We can check the movie title of our chosen movie and the most similar movies to it
       val sortedSims2 = sims.top(K + 1)(Ordering.by[(Int, Double), Double] { case (id, similarity) => similarity })
       println("\n sims with titles")
-      println(sortedSims2.slice(1, 11).map{ case (id, sim) => (titles(id), sim) }.mkString("\n"))
+      println(sortedSims2.slice(1, 11).map { case (id, sim) => (titles(id), sim) }.mkString("\n"))
 
 
       // 7. Evaluating the recommendation model
@@ -125,17 +131,17 @@ object App {
       // Below code is taken from the Apache Spark MLlib guide
       // at: http://spark.apache.org/docs/latest/mllib-guide.html#collaborative-filtering-1
 
-      val usersProducts = ratings.map{ case Rating(user, product, rating)  => (user, product)}
-      val predictions = model.predict(usersProducts).map{
+      val usersProducts = ratings.map { case Rating(user, product, rating) => (user, product) }
+      val predictions = model.predict(usersProducts).map {
         case Rating(user, product, rating) => ((user, product), rating)
       }
 
-      val ratingsAndPredictions = ratings.map{
+      val ratingsAndPredictions = ratings.map {
         case Rating(user, product, rating) => ((user, product), rating)
       }.join(predictions)
 
-      val MSE = ratingsAndPredictions.map{
-        case ((user, product), (actual, predicted)) =>  math.pow((actual - predicted), 2)
+      val MSE = ratingsAndPredictions.map {
+        case ((user, product), (actual, predicted)) => math.pow((actual - predicted), 2)
       }.reduce(_ + _) / ratingsAndPredictions.count
       println("Mean Squared Error = " + MSE)
 
@@ -165,7 +171,7 @@ object App {
       val actualMovies = moviesForUser.map(_.product)
       val predictedMovies = topKRecs.map(_.product)
       val apk10 = avgPrecisionK(actualMovies, predictedMovies, 10)
-      println("Average Precision at K = " +  apk10)
+      println("Average Precision at K = " + apk10)
 
       // Compute recommendations for all users
       val itemFactors = model.productFeatures.map { case (id, factor) => factor }.collect()
@@ -177,7 +183,7 @@ object App {
       // compute recommendations for each user, and sort them in order of score so that the actual input
       // for the APK computation will be correct
 
-      val allRecs = model.userFeatures.map{ case (userId, array) =>
+      val allRecs = model.userFeatures.map { case (userId, array) =>
         val userVector = new DoubleMatrix(array)
         val scores = imBroadcast.value.mmul(userVector)
         val sortedWithId = scores.data.zipWithIndex.sortBy(-_._1)
@@ -186,10 +192,10 @@ object App {
       }
 
       // next get all the movie ids per user, grouped by user id
-      val userMovies = ratings.map{ case Rating(user, product, rating) => (user, product) }.groupBy(_._1)
+      val userMovies = ratings.map { case Rating(user, product, rating) => (user, product) }.groupBy(_._1)
 
       // finally, compute the APK for each user, and average them to find MAPK
-      val MAPK = allRecs.join(userMovies).map{ case (userId, (predicted, actualWithIds)) =>
+      val MAPK = allRecs.join(userMovies).map { case (userId, (predicted, actualWithIds)) =>
         val actual = actualWithIds.map(_._2).toSeq
         avgPrecisionK(actual, predicted, K)
       }.reduce(_ + _) / allRecs.count
@@ -207,7 +213,7 @@ object App {
 
 
       import org.apache.spark.mllib.evaluation.RankingMetrics
-      val predictedAndTrueForRanking = allRecs.join(userMovies).map{ case (userId, (predicted, actualWithIds)) =>
+      val predictedAndTrueForRanking = allRecs.join(userMovies).map { case (userId, (predicted, actualWithIds)) =>
         val actual = actualWithIds.map(_._2)
         (predicted.toArray, actual.toArray)
       }
@@ -216,7 +222,7 @@ object App {
 
 
       // Compare to our implementation, using K = 2000 to approximate the overall MAP
-      val MAPK2000 = allRecs.join(userMovies).map{ case (userId, (predicted, actualWithIds)) =>
+      val MAPK2000 = allRecs.join(userMovies).map { case (userId, (predicted, actualWithIds)) =>
         val actual = actualWithIds.map(_._2).toSeq
         avgPrecisionK(actual, predicted, 2000)
       }.reduce(_ + _) / allRecs.count
