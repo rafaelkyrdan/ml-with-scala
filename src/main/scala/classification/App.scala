@@ -1,6 +1,16 @@
 package classification
 
 import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.mllib.linalg.Vectors
+import org.apache.spark.mllib.classification.LogisticRegressionWithSGD
+import org.apache.spark.mllib.classification.SVMWithSGD
+import org.apache.spark.mllib.classification.NaiveBayes
+import org.apache.spark.mllib.tree.DecisionTree
+import org.apache.spark.mllib.tree.configuration.Algo
+import org.apache.spark.mllib.tree.impurity.Entropy
+import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
+
 
 /**
   * Classification
@@ -33,8 +43,6 @@ object App {
 
 
       // 2. Cleaning, trimming and fixing the missing data
-      import org.apache.spark.mllib.regression.LabeledPoint
-      import org.apache.spark.mllib.linalg.Vectors
       val data = records.map { r =>
         val trimmed = r.map(_.replaceAll("\"", ""))
         val label = trimmed(r.size - 1).toInt
@@ -61,14 +69,6 @@ object App {
       // 4. Train classification models
       // To compare the performance and use of different models,
       // we train a model using logistic regression, SVM, naïve Bayes, and a decision tree.
-
-      import org.apache.spark.mllib.classification.LogisticRegressionWithSGD
-      import org.apache.spark.mllib.classification.SVMWithSGD
-      import org.apache.spark.mllib.classification.NaiveBayes
-      import org.apache.spark.mllib.tree.DecisionTree
-      import org.apache.spark.mllib.tree.configuration.Algo
-      import org.apache.spark.mllib.tree.impurity.Entropy
-
       // number iterations for logistic regression and SVM
       val numIterations = 10
       // the max depth tree for decision tree
@@ -167,8 +167,6 @@ object App {
 
       // 7. Compute area under PR and ROC curves for each model
       // generate binary classification metrics
-
-      import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 
       val metrics = Seq(lrModel, svmModel).map { model =>
         val scoreAndLabels = data.map { point =>

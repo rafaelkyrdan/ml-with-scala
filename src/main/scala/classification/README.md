@@ -17,7 +17,13 @@ models with differing parameter settings and even compare completely different m
 
 As you can see from output all 4 models showed not a very good result in 
 terms of binary classi cation performance.
- 
+
+Enhanced version(`AppEnhanced.scala`) includes the classification models
+based on logistic regression, SVM(without naïve Bayes, and a decision tree). The only
+difference is we make standardization because models make inherent assumptions 
+about the distribution or scale of input data.
+`App.scala` and `AppEnhanced.scala` files.
+
 Follow the comments in the code.
 
 ## Input data
