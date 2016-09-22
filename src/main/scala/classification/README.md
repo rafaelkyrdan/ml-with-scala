@@ -62,6 +62,18 @@ From the  output we can see that lambda has no impact in this case, since
 it will not be a problem if the combination of feature and class label not 
 occurring together in the dataset.
 
+## Cross validation example(`AppCrossValidation.scala`)
+Cross-validation provides a mechanism where we use part of our available dataset 
+to train our model and another part to evaluate the performance of this model.
+Common splits used in practice include 50/50, 60/40, and 80/20 splits.
+Compare this to the results of training and testing on the training set.
+From the output we can see that we generally achieve the highest performance 
+when regularization is lower. This is because our model has seen all the data points, 
+and with low levels of regularization, it can over- t the data set and achieve higher performance.
+
+In contrast, when we train on one dataset and test on another, we see that 
+generally a slightly higher level of regularization results in better test set performance.
+
 ## Input data
 This example uses a dataset from a competition on Kaggle. 
 The dataset was provided by StumbleUpon, and the problem relates to classifying 
