@@ -1,13 +1,12 @@
 package clustering
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.recommendation.ALS
-import org.apache.spark.mllib.recommendation.Rating
-import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.linalg.distributed.RowMatrix
-import org.apache.spark.mllib.clustering.KMeans
 import breeze.linalg._
 import breeze.numerics.pow
+import org.apache.spark.mllib.clustering.KMeans
+import org.apache.spark.mllib.linalg.Vectors
+import org.apache.spark.mllib.linalg.distributed.RowMatrix
+import org.apache.spark.mllib.recommendation.{ALS, Rating}
+import org.apache.spark.{SparkConf, SparkContext}
 
 
 /**
