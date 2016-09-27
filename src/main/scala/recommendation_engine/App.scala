@@ -1,14 +1,12 @@
 package recommendation_engine
 
+import org.apache.spark.mllib.evaluation.{RankingMetrics, RegressionMetrics}
+import org.apache.spark.mllib.recommendation.{ALS, Rating}
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.mllib.recommendation.ALS
-import org.apache.spark.mllib.recommendation.Rating
 import org.jblas.DoubleMatrix
-import org.apache.spark.mllib.evaluation.RankingMetrics
-import org.apache.spark.mllib.evaluation.RegressionMetrics
 
 /**
-  *
+  * Recommendation engine
   *
   */
 

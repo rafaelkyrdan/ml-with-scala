@@ -1,18 +1,14 @@
 package dimensionality_reduction
 
-import org.apache.spark.{SparkConf, SparkContext}
-import javax.imageio.ImageIO
-import java.io.File
-import javax.imageio.ImageIO
-import java.io.File
 import java.awt.image.BufferedImage
-import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.feature.StandardScaler
-import org.apache.spark.mllib.linalg.Matrix
-import org.apache.spark.mllib.linalg.distributed.RowMatrix
-import breeze.linalg.DenseMatrix
-import breeze.linalg.csvwrite
 import java.io.File
+import javax.imageio.ImageIO
+
+import breeze.linalg.{DenseMatrix, csvwrite}
+import org.apache.spark.mllib.feature.StandardScaler
+import org.apache.spark.mllib.linalg.Vectors
+import org.apache.spark.mllib.linalg.distributed.RowMatrix
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
   * Dimensionality reduction
