@@ -1,5 +1,5 @@
-# ml-with-scala
-Machine learning with scala
+# ml-with-spark
+Machine learning with Apache Spark
 
 Follow the comments in the code and `README` for each example. 
 
